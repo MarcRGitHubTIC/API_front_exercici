@@ -1,6 +1,6 @@
 from client import db_client
 
-def read():
+"""def read(orderby=None, contain=None, skip=0, limit=None):
     conn = db_client()
     if isinstance(conn, dict):
         print("Error de conexión: ", conn["message"])
@@ -8,7 +8,7 @@ def read():
 
     try:
         cur = conn.cursor()  
-        cur.execute("SELECT IdAlumno, IdAula, NombreAlum, Ciclo, Curso, Grupo FROM alumno")
+        cur.execute("SELECT a.NombreAlum, a.Ciclo, a.Curso, a.Grupo, aula.DescAula FROM alumno a JOIN aula ON a.IdAula = aula.IdAula")
         alumno = cur.fetchall()
         print(alumno)
 
@@ -20,7 +20,46 @@ def read():
         if conn and hasattr(conn, "close"):  
             conn.close()
 
-    return alumno
+    return alumno"""
+
+def read(orderby=None, contain=None, skip=0, limit=None):
+    conn = db_client()
+    if isinstance(conn, dict):
+        return conn
+
+    try:
+        cur = conn.cursor()
+        query = """
+        SELECT a.NombreAlum, a.Ciclo, a.Curso, a.Grupo, aula.DescAula
+        FROM alumno a
+        JOIN aula ON a.IdAula = aula.IdAula
+        """
+
+        if contain:
+            query += f" WHERE a.NombreAlum LIKE %s"
+            values = [f"%{contain}%"]
+        else:
+            values = []
+
+        if orderby in ["asc", "desc"]:
+            query += f" ORDER BY a.NombreAlum {orderby.upper()}"
+
+        if limit:
+            query += f" LIMIT %s OFFSET %s"
+            values.append(limit)
+            values.append(skip)
+
+        cur.execute(query, values)
+        alumnos = cur.fetchall()
+
+    except Exception as e:
+        return {"status": -1, "message": f"Error en la consulta: {e}"}
+
+    finally:
+        if conn and hasattr(conn, "close"):
+            conn.close()
+
+    return alumnos
 
 def read_id(id):
     conn = db_client()  

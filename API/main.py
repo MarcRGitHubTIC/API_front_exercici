@@ -18,6 +18,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
  
+class alumno_param(BaseModel):
+    nameAlum: str
+    cicle: str
+    course: str
+    group: str
+    descAula:str
+ 
 class ShowAllAlum(BaseModel):
     IdAlumno: int
     IdAula: int
@@ -25,7 +32,7 @@ class ShowAllAlum(BaseModel):
     Ciclo: str
     Curso: str
     Grupo: str
-    DescAula: int
+    DescAula: str
     Edificio: str
     Pis: int
 
@@ -56,16 +63,18 @@ class aulaModel(BaseModel):
 def read_root():
     return {"alumno API Marc R"}
 
-@app.get("/alumno/list", response_model=List[alumno_Model])
-def read_alumno():
-    alum_data = db_alumnos.read()
+@app.get("/alumno/list", response_model=List[alumno_param])
+def read_alumno(orderby: Optional[str] = None, contain: Optional[str] = None, skip: int = 0, limit: Optional[int] = None):
+    alum_data = db_alumnos.read(orderby=orderby, contain=contain, skip=skip, limit=limit) 
+    #alum_data=db_alumnos.read()
+
     
     if isinstance(alum_data, dict) and alum_data.get("status") == -1:
         raise HTTPException(status_code=500, detail=alum_data["message"])
     
     if alum_data is None:
         raise HTTPException(status_code=404, detail="Items not found")
-    
+    """
     response_data = []
     for alum in alum_data:
         response_data.append({
@@ -78,6 +87,17 @@ def read_alumno():
         })
 
     return response_data   
+    """
+    return [
+        {
+            "nameAlum": row[0],   # Assegura't que coincideixi amb el nom esperat
+            "cicle": row[1],
+            "course": row[2],     # Mapeja el camp 'curs' a 'course'
+            "group": row[3],      # Mapeja el camp 'grup' a 'group'
+            "descAula": str(row[4])  # Converteix a cadena si és necessari
+        }
+        for row in alum_data
+    ]
 
 @app.get("/alumno/show/{id}", response_model=alumno_Model)
 def read_alum_id(id: int):
