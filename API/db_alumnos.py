@@ -1,6 +1,6 @@
 from client import db_client
 
-"""def read(orderby=None, contain=None, skip=0, limit=None):
+"""def read():
     conn = db_client()
     if isinstance(conn, dict):
         print("Error de conexión: ", conn["message"])

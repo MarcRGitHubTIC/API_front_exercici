@@ -4,6 +4,8 @@ Aquest és el codi incomplet a la part del java script
 
 ![Alumnos por indice](API/Fotos/TablaAlumnos.png)
 
+![Alumnos con css](API/Fotos/TablaAlumnoscss.png)
+
 2. OrderBy asc/desc
 
 ![ascendente](API/Fotos/ascendente.png)

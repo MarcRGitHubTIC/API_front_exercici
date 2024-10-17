@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlite3 import Timestamp
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from typing import List, Optional
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
