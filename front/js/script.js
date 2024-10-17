@@ -21,13 +21,13 @@ document.addEventListener("DOMContentLoaded", async function() {
             data.forEach(alumne => {
                 const row = document.createElement("tr");
                 
-                const IdAlumno = document.createElement("td");
-                IdAlumno.textContent = alumne.idAlumno; // Este .idAlumno debe ser igual que en el main/BaseModel usado para este trozo a.k.a alumno_model
-                row.appendChild(IdAlumno);
+                //const IdAlumno = document.createElement("td");
+                //IdAlumno.textContent = alumne.idAlumno; // Este .idAlumno debe ser igual que en el main/BaseModel usado para este trozo a.k.a alumno_model
+                //row.appendChild(IdAlumno);
 
-                const IdAula = document.createElement("td");
-                IdAula.textContent = alumne.idAula; 
-                row.appendChild(IdAula);
+                //const IdAula = document.createElement("td");
+                //IdAula.textContent = alumne.idAula; 
+                //row.appendChild(IdAula);
 
                 const NombreAlum = document.createElement("td");
                 NombreAlum.textContent = alumne.nameAlum;  

@@ -74,27 +74,13 @@ def read_alumno(orderby: Optional[str] = None, contain: Optional[str] = None, sk
     
     if alum_data is None:
         raise HTTPException(status_code=404, detail="Items not found")
-    """
-    response_data = []
-    for alum in alum_data:
-        response_data.append({
-            "idAlumno":alum[0],
-            "idAula": alum[1],
-            "nameAlum": alum[2],
-            "cicle": alum[3],
-            "course": alum[4],
-            "group": alum[5]
-        })
-
-    return response_data   
-    """
     return [
         {
-            "nameAlum": row[0],   # Assegura't que coincideixi amb el nom esperat
+            "nameAlum": row[0],   
             "cicle": row[1],
-            "course": row[2],     # Mapeja el camp 'curs' a 'course'
-            "group": row[3],      # Mapeja el camp 'grup' a 'group'
-            "descAula": str(row[4])  # Converteix a cadena si és necessari
+            "course": row[2],     
+            "group": row[3],     
+            "descAula": str(row[4])  
         }
         for row in alum_data
     ]

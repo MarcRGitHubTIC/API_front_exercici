@@ -30,7 +30,7 @@ def read(orderby=None, contain=None, skip=0, limit=None):
     try:
         cur = conn.cursor()
         query = """
-        SELECT a.NombreAlum, a.Ciclo, a.Curso, a.Grupo, aula.DescAula
+        SELECT  a.NombreAlum, a.Ciclo, a.Curso, a.Grupo, aula.DescAula
         FROM alumno a
         JOIN aula ON a.IdAula = aula.IdAula
         """
