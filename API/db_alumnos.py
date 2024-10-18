@@ -200,3 +200,19 @@ def show_all():
 
     return alumno 
 
+def create_aula(aula_data):
+    try:
+        conn = db_client()
+        cur = conn.cursor()
+        query = "INSERT INTO aula (DescAula, Edificio, Pis) VALUES (%s, %s, %s)"
+        values = (aula_data.descAula, aula_data.building, aula_data.floor)
+        cur.execute(query, values)
+        conn.commit()
+
+    except Exception as e:
+        return {"status": -1, "message": f"Error en la inserción de aula: {e}"}
+
+    return cur.lastrowid
+
+
+

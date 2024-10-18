@@ -1,7 +1,10 @@
-from datetime import datetime
-from sqlite3 import Timestamp
+from csv import reader
+#from datetime import datetime
+import csv
+import io
 from fastapi import FastAPI, HTTPException, File, UploadFile
-from typing import List, Optional
+from typing import List, Optional, Union
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,6 +21,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
  
+class aulaModel(BaseModel):
+    idAula: Optional[int] = None 
+    descAula: str
+    building: str
+    floor: int
+
 class alumno_param(BaseModel):
     nameAlum: str
     cicle: str
@@ -44,20 +53,12 @@ class UpdateAlumnoModel(BaseModel):
     group: Optional[str] = None
     
 class alumno_Model(BaseModel):
-    idAlumno: int 
+    idAlumno: Optional[int] 
     idAula: int
     nameAlum: str
     cicle: str
     course: str
     group: str
-
-class aulaModel(BaseModel):
-    idAula: int
-    descAula: str
-    building: str
-    floor: int
-    createdAt: str
-    updatedAt: str
 
 @app.get("/")
 def read_root():
@@ -80,7 +81,7 @@ def read_alumno(orderby: Optional[str] = None, contain: Optional[str] = None, sk
             "cicle": row[1],
             "course": row[2],     
             "group": row[3],     
-            "descAula": str(row[4])  
+            "descAula": row[4]  
         }
         for row in alum_data
     ]
@@ -173,3 +174,39 @@ async def list_all_alum():
     
     return response_data
 
+# Funciona sin comprobar en tabla
+@app.post("/alumne/loadAlumnes")
+async def load_alumnes(file: UploadFile = File(...)):
+    if file.filename.endswith('.csv'):
+        try:
+            content = await file.read()
+            decoded_content = content.decode('utf-8').splitlines()
+            
+            reader = csv.DictReader(decoded_content)
+            
+            aulas_insertadas = []
+            alumnos_insertados = []
+
+            for row in reader:
+                try:
+                    piso = int(row['Pis'])  # Piso da por culo, nose porque
+                except ValueError as e:
+                    raise HTTPException(status_code=400, detail=f"Error en la conversión de Pis: {row['Pis']} no es un número válido")
+                
+                aula_data = aulaModel(descAula=row['DescAula'], building=row['Edificio'], floor=piso)
+                aula_id = db_alumnos.create_aula(aula_data)
+                aulas_insertadas.append(aula_id)
+
+                alumno_id = db_alumnos.create(aula_id, row['NombreAlum'], row['Ciclo'], row['Curso'], row['Grupo'])
+                alumnos_insertados.append(alumno_id)
+
+            return JSONResponse(content={
+                "message": "Datos cargados exitosamente.",
+                "aulas_insertadas": aulas_insertadas,
+                "alumnos_insertados": alumnos_insertados
+            })
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error al procesar el archivo: {str(e)}")
+    else:
+        raise HTTPException(status_code=400, detail="El archivo debe ser un CSV.")
