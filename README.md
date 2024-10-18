@@ -19,3 +19,9 @@ Contains
 skip & limit
 
 ![skip & limit](API/Fotos/skip_limit.png)
+
+Pendiente de que compruebe, pero al menos hace el insert a traves de csv
+
+![Upload1](API/Fotos/UploadAlum1.png)
+
+![Upload2](API/Fotos/UploadAlum2.png)
