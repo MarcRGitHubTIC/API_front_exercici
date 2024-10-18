@@ -200,19 +200,46 @@ def show_all():
 
     return alumno 
 
+def get_alumno_by_details(nameAlum, cicle, course, group):
+    try:
+        conn = db_client()
+        cur = conn.cursor()
+        query = """
+        SELECT * FROM alumno 
+        WHERE NombreAlum = %s AND Ciclo = %s AND Curso = %s AND Grupo = %s
+        """
+        cur.execute(query, (nameAlum, cicle, course, group))
+        alumno = cur.fetchone()
+
+    except Exception as e:
+        return {"status": -1, "message": f"Error en la consulta de alumno: {e}"}
+
+    return alumno
+
+def get_aula_by_desc(descAula):
+    try:
+        conn= db_client()
+        cur = conn.cursor()
+        query = "SELECT * FROM aula WHERE DescAula = %s"
+        cur.execute(query, (descAula,))
+        aula = cur.fetchone()
+
+    except Exception as e:
+        return {"status": -1, "message": f"Error en la consulta: {e}"}
+
+    return aula
+
 def create_aula(aula_data):
     try:
         conn = db_client()
         cur = conn.cursor()
-        query = "INSERT INTO aula (DescAula, Edificio, Pis) VALUES (%s, %s, %s)"
+        query = "INSERT INTO aula (DescAula, Edificio, Pis) VALUES (%s, %s, %s) RETURNING IdAula"
         values = (aula_data.descAula, aula_data.building, aula_data.floor)
         cur.execute(query, values)
+        aula_id = cur.fetchone()[0]
         conn.commit()
 
     except Exception as e:
         return {"status": -1, "message": f"Error en la inserción de aula: {e}"}
 
-    return cur.lastrowid
-
-
-
+    return aula_id 

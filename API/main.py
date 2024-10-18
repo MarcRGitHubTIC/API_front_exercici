@@ -174,7 +174,6 @@ async def list_all_alum():
     
     return response_data
 
-# Funciona sin comprobar en tabla
 @app.post("/alumne/loadAlumnes")
 async def load_alumnes(file: UploadFile = File(...)):
     if file.filename.endswith('.csv'):
@@ -184,26 +183,53 @@ async def load_alumnes(file: UploadFile = File(...)):
             
             reader = csv.DictReader(decoded_content)
             
-            aulas_insertadas = []
-            alumnos_insertados = []
-
+            aulasInsert = []
+            alumnosInsert = []
+            aulasExists = {}  
+            alumnosExists = {}  
+            
             for row in reader:
                 try:
-                    piso = int(row['Pis'])  # Piso da por culo, nose porque
-                except ValueError as e:
+                    piso = int(row['Pis']) # Piso da por culo
+                except ValueError:
                     raise HTTPException(status_code=400, detail=f"Error en la conversión de Pis: {row['Pis']} no es un número válido")
                 
-                aula_data = aulaModel(descAula=row['DescAula'], building=row['Edificio'], floor=piso)
-                aula_id = db_alumnos.create_aula(aula_data)
-                aulas_insertadas.append(aula_id)
+                desc_aula = row['DescAula'] 
+                if desc_aula not in aulasExists:
+                    aula = db_alumnos.get_aula_by_desc(desc_aula)
+                    if aula is None:
+                        aula_data = aulaModel(descAula=row['DescAula'], building=row['Edificio'], floor=piso)
+                        aula_id = db_alumnos.create_aula(aula_data)
+                        aulasInsert.append(aula_id)
+                        aulasExists[desc_aula] = aula_id  
+                    else:
+                        aula_id = aula[0]  
+                        aulasExists[desc_aula] = aula_id  
+                else:
+                    aula_id = aulasExists[desc_aula]  
+                    
+                nombre_alumno = row['NombreAlum']
+                ciclo = row['Ciclo']
+                curso = row['Curso']
+                grupo = row['Grupo']
+                
+                alumno_clave = f"{nombre_alumno}-{ciclo}-{curso}-{grupo}"
+                if alumno_clave not in alumnosExists:
+                    alumno = db_alumnos.get_alumno_by_details(nombre_alumno, ciclo, curso, grupo)
+                    if alumno is None:
+                        alumno_id = db_alumnos.create(aula_id, nombre_alumno, ciclo, curso, grupo)
+                        alumnosInsert.append(alumno_id)
+                        alumnosExists[alumno_clave] = alumno_id 
+                    else:
+                        alumnosExists[alumno_clave] = alumno[0]  
 
-                alumno_id = db_alumnos.create(aula_id, row['NombreAlum'], row['Ciclo'], row['Curso'], row['Grupo'])
-                alumnos_insertados.append(alumno_id)
+                else:
+                    continue  
 
             return JSONResponse(content={
                 "message": "Datos cargados exitosamente.",
-                "aulas_insertadas": aulas_insertadas,
-                "alumnos_insertados": alumnos_insertados
+                "aulasInsert": aulasInsert,
+                "alumnosInsert": alumnosInsert
             })
 
         except Exception as e:

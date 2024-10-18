@@ -45,6 +45,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                 Grupo.textContent = alumne.group;  
                 row.appendChild(Grupo);
 
+                const DescAula = document.createElement("td");
+                DescAula.textContent = alumne.descAula;  
+                row.appendChild(DescAula);
+
                 alumnesTableBody.appendChild(row);
             });
         } catch (error) {

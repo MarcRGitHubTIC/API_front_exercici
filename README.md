@@ -20,8 +20,11 @@ skip & limit
 
 ![skip & limit](API/Fotos/skip_limit.png)
 
-Pendiente de que compruebe, pero al menos hace el insert a traves de csv
+Insert a traves de csv 1
 
-![Upload1](API/Fotos/UploadAlum1.png)
+![UploadFirst](API/Fotos/UploadTOMAAAAAAA.png)
 
-![Upload2](API/Fotos/UploadAlum2.png)
+Si intento cargar el mismo archivo de nuevo con los mismos datos:
+
+![UploadSame](API/Fotos/UploadAlumSame.png)
+
