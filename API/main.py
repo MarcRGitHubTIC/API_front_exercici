@@ -228,8 +228,8 @@ async def load_alumnes(file: UploadFile = File(...)):
 
             return JSONResponse(content={
                 "message": "Datos cargados exitosamente.",
-                "aulasInsert": aulasInsert,
-                "alumnosInsert": alumnosInsert
+                "aulasInsert": len(aulasInsert),
+                "alumnosInsert": len(alumnosInsert)
             })
 
         except Exception as e:
